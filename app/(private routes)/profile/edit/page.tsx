@@ -1,11 +1,11 @@
 "use client";
 
+import css from "./EditProfilePage.module.css";
+
 import React, { useEffect, useState, MouseEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
-
-import css from "./EditProfile.module.css";
 
 type User = {
   email: string;
