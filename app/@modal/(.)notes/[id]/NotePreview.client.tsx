@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 /*api*/
-import { fetchNoteById } from "@/lib/api";
+import { fetchNoteById } from "@/lib/api/clientApi";
 
 /*types*/
 import type { Note } from "@/types/note";

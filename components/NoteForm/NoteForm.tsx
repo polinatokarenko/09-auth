@@ -13,10 +13,10 @@ import { useRouter } from "next/navigation";
 import { useCreateNoteStore } from "@/lib/store/noteStore";
 
 /*services*/
-import { createNote } from "@/lib/api";
+import { createNote } from "@/lib/api/clientApi";
 
 /*types*/
-import type { CreateNoteProps } from "@/lib/api";
+import type { CreateNoteProps } from "@/lib/api/clientApi";
 
 interface NoteFormProps {
   onClose: () => void;
