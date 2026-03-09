@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/lib/store/authStore";
-import { checkSession } from "@/lib/api/clientApi";
+import { checkSession, getMe } from "@/lib/api/clientApi";
 
 const privateRoutes = ["/notes", "/profile"];
 
@@ -17,6 +17,7 @@ export default function AuthProvider({ children }: Props) {
   const router = useRouter();
 
   const clearIsAuthenticated = useAuthStore((state) => state.clearIsAuthenticated);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +38,11 @@ export default function AuthProvider({ children }: Props) {
         if (res !== 200) {
           clearIsAuthenticated();
           router.push("/sign-in");
+          return;
         }
+
+        const user = await getMe();
+        setUser(user);
       } catch {
         clearIsAuthenticated();
         router.push("/sign-in");
@@ -47,7 +52,7 @@ export default function AuthProvider({ children }: Props) {
     };
 
     verifySession();
-  }, [pathname, clearIsAuthenticated, router]);
+  }, [pathname, clearIsAuthenticated, setUser, router]);
 
   if (loading) {
     return <p>Loading...</p>;

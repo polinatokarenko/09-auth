@@ -6,16 +6,14 @@ import React, { useEffect, useState, MouseEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
-
-type User = {
-  email: string;
-  username: string;
-  avatarUrl?: string;
-};
+import { updateMe } from "@/lib/api/clientApi";
+import type { User } from "@/types/user";
 
 export default function EditProfile() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user) as User | null;
+
+  const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [username, setUsername] = useState("");
   const [initialUsername, setInitialUsername] = useState("");
@@ -32,24 +30,13 @@ export default function EditProfile() {
     setInitialUsername(user.username);
   }, [user, router]);
 
-  const updateUsername = async (value: string) => {
-    const res = await fetch("/api/user", {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username: value }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to update username");
-    }
-  };
-
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+
+    if (!user) {
+      return;
+    }
 
     if (username === initialUsername) {
       router.push("/profile");
@@ -59,7 +46,8 @@ export default function EditProfile() {
     setLoading(true);
 
     try {
-      await updateUsername(username);
+      const updatedUser: User = await updateMe({ username });
+      setUser(updatedUser);
       router.push("/profile");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
@@ -83,9 +71,9 @@ export default function EditProfile() {
 
       <form onSubmit={handleSubmit} className={css.form}>
         <div className={css.avatarRow}>
-          {user.avatarUrl ? (
+          {user.avatar ? (
             <Image
-              src={user.avatarUrl}
+              src={user.avatar}
               alt="User avatar"
               width={96}
               height={96}

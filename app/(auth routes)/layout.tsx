@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AuthProvider from "@/components/AuthProvider/AuthProvider";
 
 type Props = {
@@ -8,5 +9,11 @@ type Props = {
 };
 
 export default function AuthRoutesLayout({ children }: Props) {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
+
   return <AuthProvider>{children}</AuthProvider>;
 }

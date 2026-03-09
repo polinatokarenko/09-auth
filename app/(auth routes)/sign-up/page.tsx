@@ -36,6 +36,7 @@ export default function SignUpPage() {
           <input
             id="email"
             type="email"
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={css.input}
@@ -47,6 +48,7 @@ export default function SignUpPage() {
           <input
             id="password"
             type="password"
+            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={css.input}

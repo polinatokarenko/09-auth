@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { checkSession } from "./lib/api/serverApi";
 
 const privateRoutes = ["/notes", "/profile"];
 const authorizedRoutes = ["/sign-in", "/sign-up"];
 
-export function proxy(request: NextRequest) {
-  const accessToken = request.cookies.get("accessToken")?.value;
+export async function proxy(request: NextRequest) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
 
   const { pathname } = request.nextUrl;
 
@@ -15,6 +19,10 @@ export function proxy(request: NextRequest) {
   const isAuthorizedRoute = authorizedRoutes.some((route) =>
     pathname.startsWith(route)
   );
+
+  if (!accessToken && refreshToken) {
+    await checkSession();
+  }
 
   if (isPrivateRoute && !accessToken) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
@@ -28,5 +36,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/notes/:path*", "/profile", "/sign-in", "/sign-up"],
+  matcher: ["/notes/:path*", "/profile/:path*", "/sign-in", "/sign-up"],
 };

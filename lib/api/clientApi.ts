@@ -52,22 +52,22 @@ export interface RegisterProps {
 }
 
 export async function register(data: RegisterProps): Promise<User> {
-  const res = await nextServer.post<User>("/auth/register/", data);
+  const res = await nextServer.post<User>("/auth/register", data);
   return res.data;
 }
 
 export async function login(data: RegisterProps): Promise<User> {
-  const res = await nextServer.post<User>("/auth/login/", data);
+  const res = await nextServer.post<User>("/auth/login", data);
   return res.data;
 }
 
 export async function logout(): Promise<number> {
-  const res = await nextServer.post("/auth/logout/");
+  const res = await nextServer.post("/auth/logout");
   return res.status;
 }
 
 export async function checkSession(): Promise<number> {
-  const res = await nextServer.get<User>("/auth/session/");
+  const res = await nextServer.get<User>("/auth/session");
   return res.status;
 }
 
@@ -77,7 +77,6 @@ export async function getMe(): Promise<User> {
 }
 
 interface UpdateProfileProps {
-    email: string,
     username: string,
 }
 
