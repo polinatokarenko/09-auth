@@ -25,13 +25,12 @@ export default function AuthNavigation() {
     const handleLogout = async () => {
         setLoading(true);
         try {
-            const res = await logout();
+            const success = await logout();
             
-            if (res !== 200) throw new Error("Logout failed");
-
+            if (!success) throw new Error("Logout failed");
             clearIsAuthenticated();
-
             router.push("/sign-in");
+
         } catch (err) {
             console.error("Logout error:", err);
         } finally {
