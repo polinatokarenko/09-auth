@@ -33,9 +33,9 @@ export default function AuthProvider({ children }: Props) {
       }
 
       try {
-        const res = await checkSession();
-
-        if (res !== 200) {
+        const isValid = await checkSession();
+        
+        if (!isValid) {
           clearIsAuthenticated();
           router.push("/sign-in");
           return;

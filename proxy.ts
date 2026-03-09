@@ -21,7 +21,14 @@ export async function proxy(request: NextRequest) {
   );
 
   if (!accessToken && refreshToken) {
-    await checkSession();
+    const res = await checkSession();
+    
+    const setCookie = res.headers["set-cookie"];
+    if (setCookie && setCookie.length > 0) {
+      const response = NextResponse.next();
+      response.headers.set("set-cookie", setCookie.join("; "));
+      return response;
+    }
   }
 
   if (isPrivateRoute && !accessToken) {
@@ -29,7 +36,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthorizedRoute && accessToken) {
-    return NextResponse.redirect(new URL("/profile", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

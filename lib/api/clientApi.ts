@@ -61,14 +61,22 @@ export async function login(data: RegisterProps): Promise<User> {
   return res.data;
 }
 
-export async function logout(): Promise<number> {
-  const res = await nextServer.post("/auth/logout");
-  return res.status;
+export async function logout(): Promise<boolean> {
+  try {
+    const res = await nextServer.post("/auth/logout");
+    return res.status === 200;
+  } catch {
+    return false;
+  }
 }
 
-export async function checkSession(): Promise<number> {
-  const res = await nextServer.get<User>("/auth/session");
-  return res.status;
+export async function checkSession(): Promise<boolean> {
+  try {
+    const res = await nextServer.get("/auth/session");
+    return res.status === 200;
+  } catch {
+    return false;
+  }
 }
 
 export async function getMe(): Promise<User> {
@@ -81,6 +89,6 @@ interface UpdateProfileProps {
 }
 
 export async function updateMe(data: UpdateProfileProps): Promise<User> {
-  const res = await nextServer.patch<User>("/users/me/", data);
+  const res = await nextServer.patch<User>("/users/me", data);
   return res.data;
 }

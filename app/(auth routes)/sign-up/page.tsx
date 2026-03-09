@@ -2,26 +2,33 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register } from "@/lib/api/clientApi";
+import { register, getMe } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
 import css from "./SignUpPage.module.css";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
       await register({ email, password });
+
+      const user = await getMe();
+      setUser(user);
+
       router.push("/profile");
     } catch (err) {
-      setError(`Registration failed: ${err}`);
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -43,6 +50,7 @@ export default function SignUpPage() {
             required
           />
         </div>
+
         <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
           <input
@@ -55,7 +63,9 @@ export default function SignUpPage() {
             required
           />
         </div>
+
         {error && <p className={css.error}>{error}</p>}
+
         <div className={css.actions}>
           <button type="submit" className={css.submitButton} disabled={loading}>
             {loading ? "Registering..." : "Register"}
