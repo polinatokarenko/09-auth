@@ -26,13 +26,34 @@ export async function proxy(request: NextRequest) {
 
       if (setCookie && setCookie.length > 0) {
         const response = NextResponse.next();
-        response.headers.set("set-cookie", setCookie.join("; "));
-        accessToken = cookieStore.get("accessToken")?.value || accessToken;
+
+        setCookie.forEach((c) => {
+          response.headers.append("set-cookie", c);
+        });
+
+        const getCookieFromSet = (name: string): string | undefined => {
+          for (const sc of setCookie) {
+            const firstPart = sc.split(";")[0].trim();
+            const [k, ...rest] = firstPart.split("=");
+            if (k === name) return rest.join("=");
+          }
+          return undefined;
+        };
+
+        const newAccess = getCookieFromSet("accessToken");
+        if (newAccess) {
+          accessToken = newAccess;
+        }
+
         if (isPrivateRoute && !accessToken) {
           return NextResponse.redirect(new URL("/sign-in", request.url));
         }
 
         return response;
+      } else {
+        if (isPrivateRoute) {
+          return NextResponse.redirect(new URL("/sign-in", request.url));
+        }
       }
     } catch {
       if (isPrivateRoute) {
